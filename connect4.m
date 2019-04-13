@@ -1,11 +1,18 @@
 %Core implementation of Connect 4
 %   inputs:
 %   sizeOfBoard - user can specify how big board he wants
-%               - for instance: sizeOfBoard = 4 will create board 4x4
 %
-%   output:
-%   board - returns final board with current win formation
-function board = connect4(lengthOfBoard, widthOfBoard)   
+function connect4(lengthOfBoard, widthOfBoard)   
+
+%take care of inputs
+if nargin == 0
+    lengthOfBoard = 7;
+    widthOfBoard = 6;
+elseif nargin == 1
+    widthOfBoard = 6;
+else
+    
+end
 
 %initialize board
 board = zeros(lengthOfBoard, widthOfBoard);
@@ -16,26 +23,65 @@ turn = 1;
 %declare player1
 player1 = 50;
 %declare player2
-player2 = 100;
+player2 = 1000;
 
 while gameOver ~= true
+    %if the board is full -> lets end the game with tie
+    if(not(ismember(0, board)))
+        disp("It is a tie")
+       break 
+    end
+    
+    %first player is on turn
     if turn == 1
+        %lets make a random move
         board = makeRandomMove(board, player1);
+        
+        %check if the move secured win
         gameOver = checkBoard(board, player1);
+        
+        %display board (simple gui)
+        basicGui(board)
+        
+        %if player secured win
+        %lets end the game
+        if gameOver
+            disp("Player 1 wins!!!!")
+            break
+        end
+        %if not change turn
         turn = 2;
+        
+    %second player is on turn
     elseif turn == 2
+        %lets make a random move
         board = makeRandomMove(board, player2);
+        
+        %check if the move secured win
         gameOver = checkBoard(board, player2);
+        
+        %display board (simple gui)
+        basicGui(board)
+        
+        %if player secured win
+        %lets end the game        
+        if gameOver
+            disp("Player 2 wins!!!!")
+            break
+        end
+        %if not change turn
         turn = 1;
     end
-    image(board)
-    display(board)
-    if gameOver
-        break
-    end
-    pause(1);
+    %little pause here to make game smoother
+    pause(0.75);
 end
 
+end
+
+%Simple gui for describing a board
+function basicGui(board)
+    image(board)
+    display(board)
 end
 
 %Function that will make correct random move
@@ -94,7 +140,7 @@ end
 
 %This function will check if the game is over
 %that means if there are diagonally/horizontaly/verticaly 4 discs of
-%current player
+%current player -> return true
 %
 %   output:
 %   isOver - returns True or False -> depends if is it over or not
@@ -102,7 +148,7 @@ function isOver = checkBoard(board, player)
     isOver = false;
     isOver = checkHorizontal(board, player);
     isOver = checkVertical(board, player);
-  %  isOver = checkDiagonal(board, player);
+    isOver = checkDiagonal(board, player);
 end
 
 %Check if the game is finished in all horizontal lines
@@ -110,7 +156,6 @@ end
 %   output:
 %   isOver - returns True or False -> depends if is it over or not
 function isOver = checkHorizontal(board, player)
-    counter = 0;
     isOver = false;
     indexes = size(board);
     
@@ -147,7 +192,6 @@ end
 %   isOver - returns True or False -> depends if is it over or not
 function isOver = checkVertical(board, player)
     isOver = false;
-    counter = 0;
     indexes = size(board);
     
     %count it for every line
@@ -178,8 +222,42 @@ function isOver = checkVertical(board, player)
 end
 
 %Check if the game is finished in all diagonal lines
-%
+%   For every direction
+%       for every coordinate
+%           we will check if there exist 3 more same numbers
 %   output:
-%   isOver - returns True or False -> depends if is it over or not
+%   isOver - returns True or False -> depends if is it game over or not
 function isOver = checkDiagonal(board, player)
+    isOver = false;
+    indexes = size(board);
+    
+    %all direction
+    directions = [1 0; 1 -1; 1 1; 0 1];
+    
+    %for every direction
+    for n = 1:length(directions)
+       lenCoord = directions(n, 1);
+       widCoord = directions(n, 2);
+       %check every coordinate
+       for x = 1:indexes(1)
+           for y = 1:indexes(2)
+               prevX = x + 3*lenCoord;
+               prevY = y + 3*widCoord;
+               %if it is in range
+               if (prevX  <= indexes(1) && prevY <= indexes(2))
+                   if (prevX >= 0 && prevY >= 0)
+                       %check if there 4 same discs
+                       nowCoord = board(x,y);
+                       if (nowCoord == player && board(x+lenCoord, y+widCoord) == player && ...
+                               player == board(x+2*lenCoord, y+2*widCoord)&&player == board(prevX, prevY))
+                           %it there are -> lets return true
+                           isOver = true;
+                           return
+                       end
+                   end
+               end
+           end
+       end
+    end
+    
 end
