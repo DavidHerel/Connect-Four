@@ -145,10 +145,11 @@ end
 %   output:
 %   isOver - returns True or False -> depends if is it over or not
 function isOver = checkBoard(board, player)
-    isOver = false;
-    isOver = checkHorizontal(board, player);
-    isOver = checkVertical(board, player);
-    isOver = checkDiagonal(board, player);
+    if checkHorizontal(board, player) || checkVertical(board, player) || checkDiagonal(board, player)
+       isOver = true;
+    else
+        isOver = false;
+    end
 end
 
 %Check if the game is finished in all horizontal lines
