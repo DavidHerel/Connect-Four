@@ -1,8 +1,8 @@
 # MTB
 
-Matlab - CTU 4th semester
-
 My implementation of game Connect Four
+
+Matlab - CTU 4th semester
 
 https://cw.fel.cvut.cz/wiki/courses/b0b17mtb/start
 
